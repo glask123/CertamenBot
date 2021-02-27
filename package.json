@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/glask123/CertamenBot#readme",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "discord.js": "^12.5.1",
     "ffmpeg": "0.0.4"
   }
