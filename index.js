@@ -1,8 +1,10 @@
+require("dotenv").config();
 const Discord = require("discord.js");
-const ffmpeg = require("@ffmpeg-installer/ffmpeg");
+//const ffmpeg = require("@ffmpeg-installer/ffmpeg");
+const fs = require("fs");
 const client = new Discord.Client();
 
-const token = "NzMyODc5NDY1NjYyNzc1MzI2.Xw7BMA.5cXPdkh8lxtc10fxvKlmhVqu2TA";
+const token = process.env.TEST_TOKEN;
 
 client.on("ready", () => {
   console.log("CertamenBot is online");
@@ -96,7 +98,10 @@ client.on("message", async (msg) => {
         .setTitle("CertamenBot Changelog")
         .setDescription("Over the last month, CertamenBot had 1 bug fix.")
         .setColor("#4C047C")
-        .addFIeld("v2.8.1", "Small patch");
+        .addFIeld(
+          "v2.8.2",
+          "–Important fix to buzzer system. \n –Secured update feature \n –Other fixes"
+        );
       channel.send(update);
       break;
     case "!serverlist":
@@ -108,6 +113,7 @@ client.on("message", async (msg) => {
             " servers."
         )
         .setColor("#4C047C");
+
       client.guilds.cache.forEach((guild) => {
         var month = parseInt(guild.joinedAt.getMonth(), 10) + 1;
         servercount.addField(
@@ -115,8 +121,7 @@ client.on("message", async (msg) => {
           "Members: " +
             guild.memberCount +
             " | Owner: " +
-            client.users.cache.find((user) => user.id === guild.ownerID)
-              .username +
+            guild.ownerID +
             " | Joined: " +
             month +
             "." +
@@ -129,21 +134,23 @@ client.on("message", async (msg) => {
       channel.send(servercount);
       break;
     case "!update":
-      client.guilds.cache.forEach((guild) => {
-        let channel = guild.channels.cache
-          .filter((chx) => chx.type === "text")
-          .find((x) => x.position === 0);
-        const newUpdate = new Discord.MessageEmbed()
-          .setTitle("CertamenBot has just been updated [v2.8.0]")
-          .setDescription(
-            "This is an automated message sent upon CertamenBot being updated, and should only be sent once per server. If there is an error, or you would like updates to be posted in a different channel, join the discord at https://discord.gg/PXwXumQ. It is recommended that at least the admin of this server joins the CertamenBot server in order to get more in-depth updates."
-          )
-          .setColor("#4C047C")
-          .setFooter(
-            "Feel free to delete this message if it is in an unconvenient place."
-          );
-        channel.send(newUpdate);
-      });
+      if (msg.author.id == "491424892890120204") {
+        client.guilds.cache.forEach((guild) => {
+          let channel = guild.channels.cache
+            .filter((chx) => chx.type === "text")
+            .find((x) => x.position === 0);
+          const newUpdate = new Discord.MessageEmbed()
+            .setTitle("CertamenBot has just been updated [v2.8.0]")
+            .setDescription(
+              "This is an automated message sent upon CertamenBot being updated, and should only be sent once per server. If there is an error, or you would like updates to be posted in a different channel, join the discord at https://discord.gg/PXwXumQ. It is recommended that at least the admin of this server joins the CertamenBot server in order to get more in-depth updates."
+            )
+            .setColor("#4C047C")
+            .setFooter(
+              "Feel free to delete this message if it is in an unconvenient place."
+            );
+          channel.send(newUpdate);
+        });
+      }
       break;
     case "!info":
       const info = new Discord.MessageEmbed()
@@ -271,7 +278,11 @@ client.on("message", async (msg) => {
       break;
     case "!join":
       if (msg.member.voice.channel && connection == 0) {
-        connection = await msg.member.voice.channel.join();
+        connection = await msg.member.voice.channel
+          .join()
+          .then((connection) => {
+            connection.voice.setSelfDeaf(true);
+          });
         msg.reply("CertamenBot is now in your voice channel.");
         voice[channelid] = "on";
       } else {
@@ -415,7 +426,10 @@ client.on("message", async (msg) => {
             channel.send("1 — " + nickname + " [" + role + "]");
           }
           if (voice[channelid] == "on") {
-            const dispatcher = connection.play("buzz2.mp3");
+            const dispatcher = connection.play(
+              fs.createReadStream("buzz2.webm"),
+              { type: "webm/opus" }
+            );
           }
           mute();
           setTimeout(unmute, 2000);
@@ -435,7 +449,10 @@ client.on("message", async (msg) => {
             );
           }
           if (voice[channelid] == "on") {
-            const dispatcher = connection.play("buzz2.mp3");
+            const dispatcher = connection.play(
+              fs.createReadStream("buzz2.webm"),
+              { type: "webm/opus" }
+            );
           }
         }
         msg.delete();
@@ -447,7 +464,10 @@ client.on("message", async (msg) => {
           channel.send("**BUZZ ORDER:**");
           channel.send("1 — " + nickname);
           if (voice[channelid] == "on") {
-            const dispatcher = connection.play("buzz2.mp3");
+            const dispatcher = connection.play(
+              fs.createReadStream("buzz2.webm"),
+              { type: "webm/opus" }
+            );
           }
           nummessages[channelid]++;
           mute();
@@ -457,7 +477,10 @@ client.on("message", async (msg) => {
           nummessages[channelid]++;
           channel.send(nummessages[channelid] + " — " + nickname);
           if (voice[channelid] == "on") {
-            const dispatcher = connection.play("buzz2.mp3");
+            const dispatcher = connection.play(
+              fs.createReadStream("buzz2.webm"),
+              { type: "webm/opus" }
+            );
           }
         }
         msg.delete();
