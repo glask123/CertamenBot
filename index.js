@@ -278,11 +278,8 @@ client.on("message", async (msg) => {
       break;
     case "!join":
       if (msg.member.voice.channel && connection == 0) {
-        connection = await msg.member.voice.channel
-          .join()
-          .then((connection) => {
-            connection.voice.setSelfDeaf(true);
-          });
+        connection = await msg.member.voice.channel.join();
+
         msg.reply("CertamenBot is now in your voice channel.");
         voice[channelid] = "on";
       } else {
@@ -420,7 +417,7 @@ client.on("message", async (msg) => {
           nicknames[channelid].push(nickname);
           roles[channelid].push(role);
           channel.send("**BUZZ ORDER:**");
-          if ((role = channel.guild.roles.everyone)) {
+          if (role == channel.guild.roles.everyone.name) {
             channel.send("1 — " + nickname);
           } else {
             channel.send("1 — " + nickname + " [" + role + "]");
@@ -441,7 +438,7 @@ client.on("message", async (msg) => {
           nummessages[channelid]++;
           nicknames[channelid].push(nickname);
           roles[channelid].push(role);
-          if ((role = channel.guild.roles.everyone)) {
+          if (role == channel.guild.roles.everyone.name) {
             channel.send(nummessages[channelid] + " — " + nickname);
           } else {
             channel.send(
@@ -563,7 +560,7 @@ client.on("message", async (msg) => {
         if (actualmessage == "on") {
           rolesinit[channelid] = "on";
           msg.reply(
-            "you have now chosen for this channel to function without roles. To change this, use '!roles off'."
+            "you have now chosen for this channel to function with roles. To change this, use '!roles off'."
           );
         } else if (actualmessage == "off") {
           rolesinit[channelid] = "off";
