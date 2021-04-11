@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const client = new Discord.Client();
 
-const token = process.env.TEST_TOKEN;
+const token = process.env.TOKEN;
 
 client.on("ready", () => {
   console.log("CertamenBot is online");
