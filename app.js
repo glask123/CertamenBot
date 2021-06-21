@@ -198,8 +198,7 @@ client.on("message", async (msg) => {
               "Disconnects CertamenBot from the voice channel. The '!end' command is still required to end buzzing",
           },
           {
-            name:
-              "buzz, b, zubb, buz, buzzz, zub (along with capital variations)",
+            name: "buzz, b, zubb, buz, buzzz, zub (along with capital variations)",
             value:
               "Will create a list of the names of the people who buzzed in order once the round is started in the channel.",
           },
@@ -214,12 +213,11 @@ client.on("message", async (msg) => {
           },
           {
             name: "!changelog",
-            value:
-              "View the latest updates and bug fixes made to CertamenBot over the last week.",
+            value: "View the latest updates and bug fixes made to CertamenBot.",
           },
           {
-            mame: "!aurelia",
-            value: "Sends the aurelia passage to the channel.",
+            name: "!aurelia",
+            value: "Sends the Aurelia passage to the channel.",
           }
         );
       channel.send(help);
@@ -411,6 +409,7 @@ client.on("message", async (msg) => {
     case "buz":
     case "zub":
     case "bazinga":
+    case "buźz":
     case "buzz":
       if (initialized[channelid] == "on" && rolesinit[channelid] == "on") {
         if (nicknames[channelid].length == 0) {
