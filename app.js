@@ -98,14 +98,14 @@ client.on("message", async (msg) => {
         .setTitle("CertamenBot Changelog")
         .setDescription("Over the last month, CertamenBot had 1 bug fix.")
         .setColor("#4C047C")
-        .addFIeld(
-          "v2.8.2",
-          "–Important fix to buzzer system. \n –Secured update feature \n –Other fixes"
+        .addField(
+          "v2.8.3",
+          "–Added buźz \n –Fixed issue with !aurelia command \n –Fixed exception thrown on !changelog"
         );
       channel.send(update);
       break;
     case "!serverlist":
-      const servercount = new Discord.MessageEmbed()
+      const serverembed1 = new Discord.MessageEmbed()
         .setTitle("Server List")
         .setDescription(
           "CertamenBot is currently in " +
@@ -114,24 +114,46 @@ client.on("message", async (msg) => {
         )
         .setColor("#4C047C");
 
+      const serverembed2 = new Discord.MessageEmbed().setColor("#4C047C");
+
+      let servercount = 0;
+
       client.guilds.cache.forEach((guild) => {
         var month = parseInt(guild.joinedAt.getMonth(), 10) + 1;
-        servercount.addField(
-          guild.name,
-          "Members: " +
-            guild.memberCount +
-            " | Owner: " +
-            guild.ownerID +
-            " | Joined: " +
-            month +
-            "." +
-            guild.joinedAt.getDate() +
-            "." +
-            guild.joinedAt.getFullYear()
-        );
+        servercount++;
+        if (servercount <= 25) {
+          serverembed1.addField(
+            guild.name,
+            "Members: " +
+              guild.memberCount +
+              " | Owner: " +
+              guild.ownerID +
+              " | Joined: " +
+              month +
+              "." +
+              guild.joinedAt.getDate() +
+              "." +
+              guild.joinedAt.getFullYear()
+          );
+        } else {
+          serverembed2.addField(
+            guild.name,
+            "Members: " +
+              guild.memberCount +
+              " | Owner: " +
+              guild.ownerID +
+              " | Joined: " +
+              month +
+              "." +
+              guild.joinedAt.getDate() +
+              "." +
+              guild.joinedAt.getFullYear()
+          );
+        }
       });
 
-      channel.send(servercount);
+      channel.send(serverembed1);
+      if (servercount > 25) channel.send(serverembed2);
       break;
     case "!update":
       if (msg.author.id == "491424892890120204") {
