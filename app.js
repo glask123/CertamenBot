@@ -220,7 +220,7 @@ client.on("message", async (msg) => {
               "Disconnects CertamenBot from the voice channel. The '!end' command is still required to end buzzing",
           },
           {
-            name: "buzz, b, zubb, buz, buzzz, zub (along with capital variations)",
+            name: "buzz, b, zubb, buz, buzzz, zub, bazinga, buźz, buzzah, bvzz, pnzz, zznq (along with capital variations)",
             value:
               "Will create a list of the names of the people who buzzed in order once the round is started in the channel.",
           },
@@ -433,6 +433,10 @@ client.on("message", async (msg) => {
     case "bazinga":
     case "buźz":
     case "buzz":
+    case "buzzah":
+    case "bvzz":
+    case "pnzz":
+    case "zznq":
       if (initialized[channelid] == "on" && rolesinit[channelid] == "on") {
         if (nicknames[channelid].length == 0) {
           nicknames[channelid].push(nickname);
