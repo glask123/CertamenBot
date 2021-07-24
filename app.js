@@ -7,8 +7,10 @@ const client = new Discord.Client();
 const token = process.env.TOKEN;
 
 client.on("ready", () => {
-  console.log("CertamenBot is online");
-  client.user.setActivity("certamen | !help & !info");
+  client.channels.cache
+    .get("727085410072658031")
+    .send("CertamenBot is online.");
+  client.user.setActivity("certamen | !help & !about");
 });
 
 var nicknames = {};
@@ -93,17 +95,6 @@ client.on("message", async (msg) => {
       }
 
       break;
-    case "!changelog":
-      const update = new Discord.MessageEmbed()
-        .setTitle("CertamenBot Changelog")
-        .setDescription("Over the last month, CertamenBot had 1 bug fix.")
-        .setColor("#4C047C")
-        .addField(
-          "v2.8.3",
-          "–Added buźz \n –Fixed issue with !aurelia command \n –Fixed exception thrown on !changelog"
-        );
-      channel.send(update);
-      break;
     case "!serverlist":
       const serverembed1 = new Discord.MessageEmbed()
         .setTitle("Server List")
@@ -118,16 +109,17 @@ client.on("message", async (msg) => {
 
       let servercount = 0;
 
-      client.guilds.cache.forEach((guild) => {
+      client.guilds.cache.forEach(async (guild) => {
         var month = parseInt(guild.joinedAt.getMonth(), 10) + 1;
         servercount++;
+        let owner = client.users.cache.get(guild.ownerID);
         if (servercount <= 25) {
           serverembed1.addField(
             guild.name,
             "Members: " +
               guild.memberCount +
               " | Owner: " +
-              guild.ownerID +
+              owner.tag.substring(0, owner.tag.length - 5) +
               " | Joined: " +
               month +
               "." +
@@ -176,17 +168,21 @@ client.on("message", async (msg) => {
       break;
     case "!info":
       const info = new Discord.MessageEmbed()
-        .setTitle("Certamenbot v2.8.1")
+        .setTitle("Certamenbot v2.9.0")
         .setColor("#4C047C")
+        .setDescription(
+          "– Removed changelog section and added log to `!info` \n– Added more buzz variations:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq*\n– Added to help card:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq\n\t·buźz\n\t·bazinga*\n– Added validation to score system, which previously would display NaN if a value other than a number was inputted\n– Added a `!clearscores` command and updated `!help`\n– Fixed issue in serverlist command where server owners would be displayed incorrectly"
+        )
         .addFields(
           {
             name: "About",
             value:
-              "CertamenBot was developed by Graydon Schulze-Kalt with the help of Kabir Ramzan.",
+              "CertamenBot is developed by Graydon Schulze-Kalt with the help of Kabir Ramzan.",
           },
           {
             name: "Help",
-            value: "Join the CertamenBot server at https://discord.gg/PXwXumQ",
+            value:
+              "Join the CertamenBot server at https://discord.gg/PXwXumQ, and visit the website at https://certamenbot.graydon.sk",
           }
         );
       channel.send(info);
@@ -286,6 +282,10 @@ client.on("message", async (msg) => {
             name: "!score / !scores",
             value:
               "Lists each team with their respective scores. If the moderator function is turned on, only the mod can access this command.",
+          },
+          {
+            name: "!clearscores",
+            value: "Resets scores for all teams in the channel.",
           }
         );
       channel.send(advanced);
@@ -365,6 +365,19 @@ client.on("message", async (msg) => {
         "The teams have been reset. Please use '!maketeams' to create the new teams list."
       );
       break;
+    case "!clearscore":
+    case "!clearscores":
+      if (initialized[channelid] == "on") {
+        if (mods[channelid] == "on") {
+          if (modslist[channelid].includes(nickname)) {
+            setAll(scores[channelid], 0);
+          } else {
+            msg.reply("you do not have permission to modify the score.");
+          }
+        } else {
+          setAll(scores[channelid], 0);
+        }
+      }
     case "!score":
     case "!scores":
       if (initialized[channelid] == "on") {
@@ -377,10 +390,7 @@ client.on("message", async (msg) => {
         if (teams[channelid].length != 0) {
           teams[channelid].forEach((team) => {
             var index = teams[channelid].indexOf(team);
-            score.addField(
-              teams[channelid][index],
-              scores[channelid][index] + " points."
-            );
+            score.addField(teams[channelid][index], scores[channelid][index]);
           });
         } else {
           score.setDescription("There are no teams set for this channel.");
@@ -425,6 +435,7 @@ client.on("message", async (msg) => {
     case "!unmute":
       msg.member.voice.setMute(false);
       break;
+
     case "b":
     case "buzzz":
     case "zubb":
@@ -692,26 +703,38 @@ client.on("message", async (msg) => {
   }
 
   function score(prefix, type) {
-    var actualmessage = msg.content.slice(prefix.length);
+    let value = msg.content.slice(prefix.length);
     teams[channelid].forEach((team) => {
-      if (actualmessage.includes(team)) {
+      if (value.includes(team)) {
         var index = teams[channelid].indexOf(team);
         var teamlength = team + " ";
-        actualmessage = actualmessage.slice(teamlength.length);
-        if (type == "add") {
-          scores[channelid][index] += parseInt(actualmessage, 10);
-          channel.send(
-            "*" + parseInt(actualmessage, 10) + " points to " + team + ".*"
-          );
+        let number = value.slice(teamlength.length);
+        if (!isNaN(parseInt(number, 10))) {
+          if (type == "add") {
+            scores[channelid][index] += parseInt(number, 10);
+            channel.send(
+              "*" + parseInt(number, 10) + " points to " + team + ".*"
+            );
+          } else {
+            scores[channelid][index] -= parseInt(number, 10);
+            channel.send(
+              "*" + parseInt(number, 10) + " points from " + team + ".*"
+            );
+          }
         } else {
-          scores[channelid][index] -= parseInt(actualmessage, 10);
-          channel.send(
-            "*" + parseInt(actualmessage, 10) + " points from " + team + ".*"
-          );
+          msg.reply("Your inputted value is not a number. Please try again.");
         }
       }
     });
     msg.delete();
+  }
+
+  function setAll(a, v) {
+    var i,
+      n = a.length;
+    for (i = 0; i < n; ++i) {
+      a[i] = v;
+    }
   }
 });
 
