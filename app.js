@@ -7,8 +7,29 @@ const client = new Discord.Client();
 const token = process.env.TOKEN;
 
 client.on("ready", () => {
+  let memberCount = 0;
+  let serverCount = client.guilds.cache.size;
+  client.guilds.cache.forEach(async (guild) => {
+    memberCount += guild.memberCount;
+  });
   console.log("CertamenBot is online.");
-  client.user.setActivity("certamen | !help & !about");
+  const list = [
+    ["certamen", "PLAYING"],
+    ["!help & !about", "COMPETING"],
+    [`${serverCount} servers`, "WATCHING"],
+    [`${memberCount} certaminatores`, "LISTENING"],
+  ];
+  let index = 0;
+  setInterval(() => {
+    if (index == 3) {
+      index = 0;
+    } else {
+      index++;
+    }
+    client.user.setActivity(list[index][0], {
+      type: list[index][1],
+    });
+  }, 10000);
 });
 
 var nicknames = {};
@@ -95,7 +116,6 @@ client.on("message", async (msg) => {
       break;
     case "!serverlist":
       const serverembed1 = new Discord.MessageEmbed()
-        .setTitle("Server List")
         .setDescription(
           "CertamenBot is currently in " +
             client.guilds.cache.size +
@@ -111,13 +131,17 @@ client.on("message", async (msg) => {
         var month = parseInt(guild.joinedAt.getMonth(), 10) + 1;
         servercount++;
         let owner = client.users.cache.get(guild.ownerID);
+        if (typeof owner == "undefined") {
+          owner = guild.ownerID;
+        }
+        console.log(owner);
         if (servercount <= 25) {
           serverembed1.addField(
             guild.name,
             "Members: " +
               guild.memberCount +
               " | Owner: " +
-              owner.tag.substring(0, owner.tag.length - 5) +
+              owner.username +
               " | Joined: " +
               month +
               "." +
@@ -131,8 +155,8 @@ client.on("message", async (msg) => {
             "Members: " +
               guild.memberCount +
               " | Owner: " +
-              guild.ownerID +
-              " | Joined: " +
+              owner.username +
+              +" | Joined: " +
               month +
               "." +
               guild.joinedAt.getDate() +
@@ -166,10 +190,10 @@ client.on("message", async (msg) => {
       break;
     case "!info":
       const info = new Discord.MessageEmbed()
-        .setTitle("Certamenbot v2.9.0")
+        .setTitle("Certamenbot v2.9.1")
         .setColor("#4C047C")
         .setDescription(
-          "– Removed changelog section and added log to `!info` \n– Added more buzz variations:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq*\n– Added to help card:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq\n\t·buźz\n\t·bazinga*\n– Added validation to score system, which previously would display NaN if a value other than a number was inputted\n– Added a `!clearscores` command and updated `!help`\n– Fixed issue in serverlist command where server owners would be displayed incorrectly"
+          "– Removed changelog section and added log to `!info` \n– Added more buzz variations:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq*\n– Added to help card:\n\t*·buzzah\n\t·bvzz\n\t·pnzz\n\t·zznq\n\t·buźz\n\t·bazinga*\n– Added validation to score system, which previously would display NaN if a value other than a number was inputted\n– Added a `!clearscores` command and updated `!help`\n– Fixed issue in serverlist command where server owners would be displayed incorrectly\n– Updated status"
         )
         .addFields(
           {
