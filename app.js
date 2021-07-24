@@ -7,9 +7,7 @@ const client = new Discord.Client();
 const token = process.env.TOKEN;
 
 client.on("ready", () => {
-  client.channels.cache
-    .get("727085410072658031")
-    .send("CertamenBot is online.");
+  console.log("CertamenBot is online.");
   client.user.setActivity("certamen | !help & !about");
 });
 
